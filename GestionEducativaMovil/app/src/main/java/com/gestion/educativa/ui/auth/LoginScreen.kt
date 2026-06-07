@@ -43,17 +43,22 @@ fun LoginScreen(
         if (state.isLoggedIn) onLoginSuccess()
     }
 
-    val backgroundBrush = Brush.verticalGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-            MaterialTheme.colorScheme.background
-        )
-    )
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundBrush)
+            .background(MaterialTheme.colorScheme.background)
+            .androidx.compose.ui.draw.drawBehind {
+                drawCircle(
+                    color = Color(0xFF4F46E5).copy(alpha = 0.18f),
+                    radius = 280.dp.toPx(),
+                    center = androidx.compose.ui.geometry.Offset(0f, 0f)
+                )
+                drawCircle(
+                    color = Color(0xFF0EA5E9).copy(alpha = 0.14f),
+                    radius = 250.dp.toPx(),
+                    center = androidx.compose.ui.geometry.Offset(size.width, size.height * 0.75f)
+                )
+            }
     ) {
         Column(
             modifier = Modifier
@@ -63,66 +68,61 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Spacer(Modifier.height(56.dp))
+            Spacer(Modifier.height(48.dp))
 
             // Logo Header Section
             Surface(
                 modifier = Modifier
-                    .size(96.dp)
-                    .shadow(4.dp, RoundedCornerShape(28.dp))
-                    .border(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), RoundedCornerShape(28.dp)),
-                shape = RoundedCornerShape(28.dp),
+                    .size(90.dp)
+                    .shadow(8.dp, RoundedCornerShape(24.dp))
+                    .border(1.5.dp, Color.White, RoundedCornerShape(24.dp)),
+                shape = RoundedCornerShape(24.dp),
                 color = MaterialTheme.colorScheme.surface
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    val iconGradient = Brush.linearGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.secondary
-                        )
-                    )
                     Icon(
                         Icons.Default.School,
                         contentDescription = null,
-                        modifier = Modifier.size(48.dp),
+                        modifier = Modifier.size(44.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
             
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(24.dp))
             
             Text(
                 text = "Admisión de Instituto Educativo",
                 style = MaterialTheme.typography.headlineMedium.copy(
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
+                    letterSpacing = 0.25.sp
                 ),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
             )
             
             Text(
                 text = "Sistema de Admisiones e Información Académica",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
             )
 
-            Spacer(Modifier.height(36.dp))
+            Spacer(Modifier.height(32.dp))
 
-            // Login Input Form Card
+            // Login Input Form Card with Glassmorphic Accent
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(3.dp, RoundedCornerShape(24.dp))
-                    .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.1f), RoundedCornerShape(24.dp)),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    .shadow(12.dp, RoundedCornerShape(28.dp))
+                    .border(1.2.dp, Color.White.copy(alpha = 0.7f), RoundedCornerShape(28.dp)),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f))
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier.padding(28.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(

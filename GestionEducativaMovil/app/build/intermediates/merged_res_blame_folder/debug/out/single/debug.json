@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.gestion.educativa.app-merged_res-62:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.gestion.educativa.app-main-64:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.gestion.educativa.app-merged_res-62:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.gestion.educativa.app-main-64:/mipmap-anydpi-v26/ic_launcher.xml"
+    }
+]

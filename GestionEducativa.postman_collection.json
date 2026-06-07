@@ -1,0 +1,1147 @@
+{
+	"info": {
+		"_postman_id": "8b584d41-4822-4467-8547-2cbdfb5368a5",
+		"name": "Gestión Educativa API",
+		"description": "Colección de endpoints para el sistema de Gestión Educativa Móvil (Admisión Instituto). Permite interactuar con el backend de Django REST Framework en PostgreSQL.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Autenticación",
+			"item": [
+				{
+					"name": "Iniciar Sesión (Login)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access) {",
+									"    pm.collectionVariables.set(\"access_token\", jsonData.access);",
+									"}",
+									"if (jsonData.refresh) {",
+									"    pm.collectionVariables.set(\"refresh_token\", jsonData.refresh);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Registrar Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"usuario_nuevo\",\n    \"email\": \"nuevo@instituto.edu\",\n    \"password\": \"pass12345\",\n    \"first_name\": \"Nombre\",\n    \"last_name\": \"Apellido\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refrescar Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access) {",
+									"    pm.collectionVariables.set(\"access_token\", jsonData.access);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cerrar Sesión (Logout)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/logout/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Facultades",
+			"item": [
+				{
+					"name": "Listar Facultades",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/facultades/?page=1&search=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"facultades",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Facultad",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/facultades/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"facultades",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Facultad",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Facultad de Ingeniería y Ciencias\",\n    \"codigo\": \"FIC-001\",\n    \"descripcion\": \"Facultad de carreras tecnológicas y científicas\",\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/facultades/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"facultades",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Facultad",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Facultad de Ingeniería y Ciencias Aplicadas\",\n    \"codigo\": \"FIC-001\",\n    \"descripcion\": \"Facultad modificada con ciencias aplicadas\",\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/facultades/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"facultades",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Facultad",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/facultades/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"facultades",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Carreras",
+			"item": [
+				{
+					"name": "Listar Carreras",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/carreras/?page=1&search=&facultad=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carreras",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "facultad",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Carrera",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/carreras/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carreras",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Carrera",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"facultad\": 1,\n    \"nombre\": \"Ingeniería de Software\",\n    \"codigo\": \"ISW-01\",\n    \"duracion_semestres\": 9,\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/carreras/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carreras",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Carrera",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"facultad\": 1,\n    \"nombre\": \"Ingeniería de Software Avanzado\",\n    \"codigo\": \"ISW-01\",\n    \"duracion_semestres\": 9,\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/carreras/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carreras",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Carrera",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/carreras/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"carreras",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Docentes",
+			"item": [
+				{
+					"name": "Listar Docentes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/docentes/?page=1&search=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"docentes",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Docente",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/docentes/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"docentes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Docente",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": 2,\n    \"cedula\": \"1756483921\",\n    \"telefono\": \"0987654321\",\n    \"especialidad\": \"Arquitectura de Software\",\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/docentes/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"docentes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Docente",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": 2,\n    \"cedula\": \"1756483921\",\n    \"telefono\": \"0987654322\",\n    \"especialidad\": \"Ingeniería de Requisitos\",\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/docentes/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"docentes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Docente",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/docentes/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"docentes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Estudiantes",
+			"item": [
+				{
+					"name": "Listar Estudiantes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/estudiantes/?page=1&search=&carrera=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"estudiantes",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "carrera",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Estudiante",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/estudiantes/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"estudiantes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Estudiante",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": 3,\n    \"carrera\": 1,\n    \"cedula\": \"1798362451\",\n    \"telefono\": \"0998877665\",\n    \"semestre_actual\": 1,\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/estudiantes/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"estudiantes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Estudiante",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user\": 3,\n    \"carrera\": 1,\n    \"cedula\": \"1798362451\",\n    \"telefono\": \"0998877660\",\n    \"semestre_actual\": 2,\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/estudiantes/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"estudiantes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Estudiante",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/estudiantes/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"estudiantes",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Materias",
+			"item": [
+				{
+					"name": "Listar Materias",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/materias/?page=1&search=&carrera=&semestre=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materias",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "carrera",
+									"value": ""
+								},
+								{
+									"key": "semestre",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Materia",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/materias/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materias",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Materia",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"carrera\": 1,\n    \"docente\": 1,\n    \"nombre\": \"Programación Orientada a Objetos\",\n    \"codigo\": \"POO-02\",\n    \"creditos\": 4,\n    \"semestre\": 2,\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/materias/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materias",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Materia",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"carrera\": 1,\n    \"docente\": 1,\n    \"nombre\": \"Programación Avanzada Orientada a Objetos\",\n    \"codigo\": \"POO-02\",\n    \"creditos\": 4,\n    \"semestre\": 2,\n    \"activo\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/materias/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materias",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Materia",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/materias/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materias",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Matrículas",
+			"item": [
+				{
+					"name": "Listar Matrículas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/matriculas/?page=1&search=&estado=&estudiante=&materia=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"matriculas",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "estado",
+									"value": ""
+								},
+								{
+									"key": "estudiante",
+									"value": ""
+								},
+								{
+									"key": "materia",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Matrícula",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/matriculas/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"matriculas",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Matrícula",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"estudiante\": 1,\n    \"materia\": 1,\n    \"periodo\": \"2026-I\",\n    \"estado\": \"activa\",\n    \"fecha_matricula\": \"2026-06-06\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/matriculas/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"matriculas",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Matrícula",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"estudiante\": 1,\n    \"materia\": 1,\n    \"periodo\": \"2026-I\",\n    \"estado\": \"finalizada\",\n    \"fecha_matricula\": \"2026-06-06\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/matriculas/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"matriculas",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Matrícula",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/matriculas/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"matriculas",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notas",
+			"item": [
+				{
+					"name": "Listar Notas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/notas/?page=1&matricula=&aprobado=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notas",
+								""
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "matricula",
+									"value": ""
+								},
+								{
+									"key": "aprobado",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Obtener Nota",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/notas/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notas",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Nota",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"matricula\": 1,\n    \"parcial1\": 8.5,\n    \"parcial2\": 9.0,\n    \"examen_final\": 8.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/notas/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notas",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Nota",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"matricula\": 1,\n    \"parcial1\": 9.0,\n    \"parcial2\": 9.5,\n    \"examen_final\": 9.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/notas/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notas",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Nota",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/notas/1/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notas",
+								"1",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://macias-admisiones.uaeftt-ute.site/api",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

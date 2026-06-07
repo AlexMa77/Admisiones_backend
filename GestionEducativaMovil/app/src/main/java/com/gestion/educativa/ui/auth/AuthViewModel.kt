@@ -3,6 +3,8 @@ package com.gestion.educativa.ui.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gestion.educativa.data.api.TokenManager
+import com.gestion.educativa.data.model.UserRole
+import com.gestion.educativa.data.model.RoleResolver
 import com.gestion.educativa.data.preferences.UserPreferences
 import com.gestion.educativa.data.repository.AuthRepository
 import com.gestion.educativa.utils.Resource
@@ -16,6 +18,7 @@ data class AuthUiState(
     val isLoggedIn: Boolean = false,
     val isAdmin: Boolean = false,
     val username: String? = null,
+    val role: UserRole = UserRole.ESTUDIANTE,
     val error: String? = null,
     val successMessage: String? = null,
     val isSessionChecked: Boolean = false
@@ -51,7 +54,8 @@ class AuthViewModel @Inject constructor(
                 val isAdmin = values[3].toBoolean()
                 if (access != null && refresh != null) {
                     repository.restoreSession(access, refresh, username ?: "", isAdmin)
-                    _state.update { it.copy(isLoggedIn = true, isAdmin = isAdmin, username = username, isSessionChecked = true) }
+                    val resolvedRole = RoleResolver.resolveRole(username, isAdmin)
+                    _state.update { it.copy(isLoggedIn = true, isAdmin = isAdmin, username = username, role = resolvedRole, isSessionChecked = true) }
                 } else {
                     _state.update { it.copy(isSessionChecked = true) }
                 }
@@ -68,8 +72,13 @@ class AuthViewModel @Inject constructor(
             _state.update { it.copy(isLoading = true, error = null) }
             when (val result = repository.login(username, password)) {
                 is Resource.Success -> _state.update {
-                    it.copy(isLoading = false, isLoggedIn = true,
-                        isAdmin = tokenManager.isAdmin, username = tokenManager.username)
+                    it.copy(
+                        isLoading = false,
+                        isLoggedIn = true,
+                        isAdmin = tokenManager.isAdmin,
+                        username = tokenManager.username,
+                        role = tokenManager.role
+                    )
                 }
                 is Resource.Error -> _state.update {
                     it.copy(isLoading = false, error = result.message)

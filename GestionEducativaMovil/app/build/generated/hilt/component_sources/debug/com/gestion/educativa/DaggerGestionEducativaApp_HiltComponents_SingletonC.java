@@ -32,6 +32,8 @@ import com.gestion.educativa.ui.estudiante.EstudianteViewModel;
 import com.gestion.educativa.ui.estudiante.EstudianteViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.gestion.educativa.ui.facultad.FacultadViewModel;
 import com.gestion.educativa.ui.facultad.FacultadViewModel_HiltModules_KeyModule_ProvideFactory;
+import com.gestion.educativa.ui.home.StudentPortalViewModel;
+import com.gestion.educativa.ui.home.StudentPortalViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.gestion.educativa.ui.materia.MateriaViewModel;
 import com.gestion.educativa.ui.materia.MateriaViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.gestion.educativa.ui.matricula.MatriculaViewModel;
@@ -397,7 +399,7 @@ public final class DaggerGestionEducativaApp_HiltComponents_SingletonC {
 
     @Override
     public Set<String> getViewModelKeys() {
-      return SetBuilder.<String>newSetBuilder(8).add(AuthViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CarreraViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(DocenteViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(EstudianteViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(FacultadViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(MateriaViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(MatriculaViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(NotaViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
+      return SetBuilder.<String>newSetBuilder(9).add(AuthViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(CarreraViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(DocenteViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(EstudianteViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(FacultadViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(MateriaViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(MatriculaViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(NotaViewModel_HiltModules_KeyModule_ProvideFactory.provide()).add(StudentPortalViewModel_HiltModules_KeyModule_ProvideFactory.provide()).build();
     }
 
     @Override
@@ -439,6 +441,8 @@ public final class DaggerGestionEducativaApp_HiltComponents_SingletonC {
 
     private Provider<NotaViewModel> notaViewModelProvider;
 
+    private Provider<StudentPortalViewModel> studentPortalViewModelProvider;
+
     private ViewModelCImpl(SingletonCImpl singletonCImpl,
         ActivityRetainedCImpl activityRetainedCImpl, SavedStateHandle savedStateHandleParam,
         ViewModelLifecycle viewModelLifecycleParam) {
@@ -460,11 +464,12 @@ public final class DaggerGestionEducativaApp_HiltComponents_SingletonC {
       this.materiaViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
       this.matriculaViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
       this.notaViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
+      this.studentPortalViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
     }
 
     @Override
     public Map<String, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(8).put("com.gestion.educativa.ui.auth.AuthViewModel", ((Provider) authViewModelProvider)).put("com.gestion.educativa.ui.carrera.CarreraViewModel", ((Provider) carreraViewModelProvider)).put("com.gestion.educativa.ui.docente.DocenteViewModel", ((Provider) docenteViewModelProvider)).put("com.gestion.educativa.ui.estudiante.EstudianteViewModel", ((Provider) estudianteViewModelProvider)).put("com.gestion.educativa.ui.facultad.FacultadViewModel", ((Provider) facultadViewModelProvider)).put("com.gestion.educativa.ui.materia.MateriaViewModel", ((Provider) materiaViewModelProvider)).put("com.gestion.educativa.ui.matricula.MatriculaViewModel", ((Provider) matriculaViewModelProvider)).put("com.gestion.educativa.ui.nota.NotaViewModel", ((Provider) notaViewModelProvider)).build();
+      return MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(9).put("com.gestion.educativa.ui.auth.AuthViewModel", ((Provider) authViewModelProvider)).put("com.gestion.educativa.ui.carrera.CarreraViewModel", ((Provider) carreraViewModelProvider)).put("com.gestion.educativa.ui.docente.DocenteViewModel", ((Provider) docenteViewModelProvider)).put("com.gestion.educativa.ui.estudiante.EstudianteViewModel", ((Provider) estudianteViewModelProvider)).put("com.gestion.educativa.ui.facultad.FacultadViewModel", ((Provider) facultadViewModelProvider)).put("com.gestion.educativa.ui.materia.MateriaViewModel", ((Provider) materiaViewModelProvider)).put("com.gestion.educativa.ui.matricula.MatriculaViewModel", ((Provider) matriculaViewModelProvider)).put("com.gestion.educativa.ui.nota.NotaViewModel", ((Provider) notaViewModelProvider)).put("com.gestion.educativa.ui.home.StudentPortalViewModel", ((Provider) studentPortalViewModelProvider)).build();
     }
 
     @Override
@@ -516,6 +521,9 @@ public final class DaggerGestionEducativaApp_HiltComponents_SingletonC {
 
           case 7: // com.gestion.educativa.ui.nota.NotaViewModel 
           return (T) new NotaViewModel(singletonCImpl.notaRepositoryProvider.get(), singletonCImpl.tokenManagerProvider.get());
+
+          case 8: // com.gestion.educativa.ui.home.StudentPortalViewModel 
+          return (T) new StudentPortalViewModel(singletonCImpl.estudianteRepositoryProvider.get(), singletonCImpl.matriculaRepositoryProvider.get(), singletonCImpl.notaRepositoryProvider.get(), singletonCImpl.tokenManagerProvider.get());
 
           default: throw new AssertionError(id);
         }

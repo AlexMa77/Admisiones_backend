@@ -21,7 +21,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextAlign
 import com.gestion.educativa.ui.components.GradientButton
+import com.gestion.educativa.data.model.UserRole
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +41,7 @@ fun RegisterScreen(
     var lastName by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var selectedRole by remember { mutableStateOf(UserRole.ESTUDIANTE) }
 
     LaunchedEffect(state.successMessage) {
         if (state.successMessage != null) {
@@ -141,6 +145,77 @@ fun RegisterScreen(
                             }
                         }
 
+                        Spacer(Modifier.height(4.dp))
+
+                        Text(
+                            text = "Selecciona tu Rol",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            val roles = listOf(UserRole.ESTUDIANTE, UserRole.DOCENTE)
+                            roles.forEach { role ->
+                                val isSelected = selectedRole == role
+                                val borderColor = if (isSelected) role.gradientColors.first() else MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                                val bgColor = if (isSelected) role.gradientColors.first().copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
+                                val tintColor = if (isSelected) role.gradientColors.first() else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+
+                                Card(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .border(2.dp, borderColor, RoundedCornerShape(16.dp))
+                                        .clickable { selectedRole = role },
+                                    colors = CardDefaults.cardColors(containerColor = bgColor),
+                                    shape = RoundedCornerShape(16.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(12.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = role.icon,
+                                            contentDescription = null,
+                                            tint = tintColor,
+                                            modifier = Modifier.size(28.dp)
+                                        )
+                                        Spacer(Modifier.height(8.dp))
+                                        Text(
+                                            text = when(role) {
+                                                UserRole.ESTUDIANTE -> "Aspirante"
+                                                UserRole.DOCENTE -> "Docente"
+                                                else -> role.displayName
+                                            },
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = tintColor,
+                                            textAlign = TextAlign.Center
+                                        )
+                                        Spacer(Modifier.height(2.dp))
+                                        Text(
+                                            text = when(role) {
+                                                UserRole.ESTUDIANTE -> "Consulta asignaturas y notas"
+                                                UserRole.DOCENTE -> "Evalúa y califica alumnos"
+                                                else -> role.description
+                                            },
+                                            style = MaterialTheme.typography.bodySmall,
+                                            fontSize = 10.sp,
+                                            color = tintColor.copy(alpha = 0.8f),
+                                            textAlign = TextAlign.Center,
+                                            maxLines = 2
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        Spacer(Modifier.height(4.dp))
+
                         // Username field
                         OutlinedTextField(
                             value = username,
@@ -234,7 +309,14 @@ fun RegisterScreen(
                         // Register Button using GradientButton
                         GradientButton(
                             text = "Registrarse",
-                            onClick = { viewModel.register(username, email, password, firstName, lastName) },
+                            onClick = {
+                                val finalUsername = when (selectedRole) {
+                                    UserRole.DOCENTE -> if (username.endsWith("_docente")) username else "${username}_docente"
+                                    UserRole.ESTUDIANTE -> if (username.endsWith("_estudiante")) username else "${username}_estudiante"
+                                    else -> username
+                                }
+                                viewModel.register(finalUsername, email, password, firstName, lastName)
+                            },
                             loading = state.isLoading,
                             icon = Icons.Default.PersonAdd
                         )

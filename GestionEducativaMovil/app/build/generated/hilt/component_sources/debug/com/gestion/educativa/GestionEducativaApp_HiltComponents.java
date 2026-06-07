@@ -6,6 +6,7 @@ import com.gestion.educativa.ui.carrera.CarreraViewModel_HiltModules;
 import com.gestion.educativa.ui.docente.DocenteViewModel_HiltModules;
 import com.gestion.educativa.ui.estudiante.EstudianteViewModel_HiltModules;
 import com.gestion.educativa.ui.facultad.FacultadViewModel_HiltModules;
+import com.gestion.educativa.ui.home.StudentPortalViewModel_HiltModules;
 import com.gestion.educativa.ui.materia.MateriaViewModel_HiltModules;
 import com.gestion.educativa.ui.matricula.MatriculaViewModel_HiltModules;
 import com.gestion.educativa.ui.nota.NotaViewModel_HiltModules;
@@ -171,7 +172,8 @@ public final class GestionEducativaApp_HiltComponents {
           HiltWrapper_SavedStateHandleModule.class,
           MateriaViewModel_HiltModules.KeyModule.class,
           MatriculaViewModel_HiltModules.KeyModule.class,
-          NotaViewModel_HiltModules.KeyModule.class
+          NotaViewModel_HiltModules.KeyModule.class,
+          StudentPortalViewModel_HiltModules.KeyModule.class
       }
   )
   @ActivityRetainedScoped
@@ -215,7 +217,8 @@ public final class GestionEducativaApp_HiltComponents {
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           MateriaViewModel_HiltModules.BindsModule.class,
           MatriculaViewModel_HiltModules.BindsModule.class,
-          NotaViewModel_HiltModules.BindsModule.class
+          NotaViewModel_HiltModules.BindsModule.class,
+          StudentPortalViewModel_HiltModules.BindsModule.class
       }
   )
   @ViewModelScoped

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gestion.educativa.data.model.Nota
+import com.gestion.educativa.data.model.UserRole
 import com.gestion.educativa.ui.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +32,10 @@ import com.gestion.educativa.ui.components.*
 fun NotaListScreen(viewModel: NotaViewModel, onDetail: (Int) -> Unit, onCreate: () -> Unit, onBack: () -> Unit) {
     val state by viewModel.state.collectAsState()
     var deleteTarget by remember { mutableStateOf<Nota?>(null) }
+    
+    val userRole = remember { viewModel.tokenManager.role }
+    val canModify = userRole == UserRole.ADMIN || userRole == UserRole.DOCENTE
+    val canDelete = userRole == UserRole.ADMIN
 
     deleteTarget?.let { n ->
         ConfirmDeleteDialog("Nota #${n.id}", onConfirm = { viewModel.delete(n.id) { deleteTarget = null } }, onDismiss = { deleteTarget = null })
@@ -48,7 +53,7 @@ fun NotaListScreen(viewModel: NotaViewModel, onDetail: (Int) -> Unit, onCreate: 
             )
         },
         floatingActionButton = {
-            if (viewModel.tokenManager.isAdmin) {
+            if (canModify) {
                 FloatingActionButton(
                     onClick = onCreate,
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -99,7 +104,7 @@ fun NotaListScreen(viewModel: NotaViewModel, onDetail: (Int) -> Unit, onCreate: 
                                 Spacer(Modifier.width(16.dp))
                                 Column(Modifier.weight(1f)) {
                                     Text("Nota #${item.id} — Matrícula #${item.matricula}", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Text("P1: ${item.parcial1 ?: "—"} | P2: ${item.parcial2 ?: "—"} | Final: ${item.examenFinal ?: "—"}",
+                                    Text("Raz. Lógico: ${item.parcial1 ?: "—"} | Comp. Lectora: ${item.parcial2 ?: "—"} | Con. Especialidad: ${item.examenFinal ?: "—"}",
                                         style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     item.notaFinal?.let { nf ->
                                         Row(
@@ -107,7 +112,7 @@ fun NotaListScreen(viewModel: NotaViewModel, onDetail: (Int) -> Unit, onCreate: 
                                             modifier = Modifier.padding(top = 6.dp)
                                         ) {
                                             Text(
-                                                "Nota Final: ${String.format("%.2f", nf)}  ",
+                                                "Promedio de Admisión: ${String.format("%.2f", nf)}  ",
                                                 style = MaterialTheme.typography.bodyMedium,
                                                 fontWeight = FontWeight.SemiBold
                                             )
@@ -115,7 +120,7 @@ fun NotaListScreen(viewModel: NotaViewModel, onDetail: (Int) -> Unit, onCreate: 
                                         }
                                     }
                                 }
-                                if (viewModel.tokenManager.isAdmin) IconButton(onClick = { deleteTarget = item }) {
+                                if (canDelete) IconButton(onClick = { deleteTarget = item }) {
                                     Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) }
                             }
                         }
@@ -133,13 +138,17 @@ fun NotaListScreen(viewModel: NotaViewModel, onDetail: (Int) -> Unit, onCreate: 
 fun NotaDetailScreen(id: Int, viewModel: NotaViewModel, onEdit: (Int) -> Unit, onBack: () -> Unit) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(id) { viewModel.loadDetail(id) }
+    
+    val userRole = remember { viewModel.tokenManager.role }
+    val canEdit = userRole == UserRole.ADMIN || userRole == UserRole.DOCENTE
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Detalle Nota", fontWeight = FontWeight.Bold) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, null) } },
                 actions = {
-                    if (viewModel.tokenManager.isAdmin) IconButton(onClick = { onEdit(id) }) { Icon(Icons.Default.Edit, null) }
+                    if (canEdit) IconButton(onClick = { onEdit(id) }) { Icon(Icons.Default.Edit, null) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -198,27 +207,27 @@ fun NotaDetailScreen(id: Int, viewModel: NotaViewModel, onEdit: (Int) -> Unit, o
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
                             Column(Modifier.padding(20.dp)) {
-                                SectionHeader("Calificaciones")
+                                SectionHeader("Calificaciones del Examen")
                                 Spacer(Modifier.height(8.dp))
                                 InfoRow("Matrícula ID", n.matricula.toString())
                                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f), modifier = Modifier.padding(vertical = 4.dp))
-                                InfoRow("Parcial 1", n.parcial1?.let { String.format("%.2f", it) } ?: "—")
+                                InfoRow("Razonamiento Lógico (P1)", n.parcial1?.let { String.format("%.2f", it) } ?: "—")
                                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f), modifier = Modifier.padding(vertical = 4.dp))
-                                InfoRow("Parcial 2", n.parcial2?.let { String.format("%.2f", it) } ?: "—")
+                                InfoRow("Comprensión Lectora (P2)", n.parcial2?.let { String.format("%.2f", it) } ?: "—")
                                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f), modifier = Modifier.padding(vertical = 4.dp))
-                                InfoRow("Examen Final", n.examenFinal?.let { String.format("%.2f", it) } ?: "—")
+                                InfoRow("Conocimientos Especialidad (EF)", n.examenFinal?.let { String.format("%.2f", it) } ?: "—")
                                 
                                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f), modifier = Modifier.padding(vertical = 8.dp))
-                                SectionHeader("Resultado")
+                                SectionHeader("Resultado de Admisión")
                                 Spacer(Modifier.height(8.dp))
                                 n.notaFinal?.let {
-                                    InfoRow("Nota Final", String.format("%.2f", it))
+                                    InfoRow("Promedio de Admisión", String.format("%.2f", it))
                                     Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.08f), modifier = Modifier.padding(vertical = 4.dp))
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)
                                     ) {
-                                        Text("Estado de Aprobación", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium, modifier = Modifier.weight(0.4f))
+                                        Text("Estado de Admisión", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Medium, modifier = Modifier.weight(0.4f))
                                         Box(modifier = Modifier.weight(0.6f)) {
                                             StatusChip(aprobado)
                                         }
@@ -303,16 +312,16 @@ fun NotaFormScreen(id: Int?, viewModel: NotaViewModel, onSuccess: () -> Unit, on
                         modifier = Modifier.padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text("Detalles de Calificación", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("Detalles de Calificación de Examen", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         
                         FormField("ID Matrícula *", matriculaId, { matriculaId = it })
                         
-                        Text("Calificaciones (0-10)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                        Text("Calificaciones del Examen (0-10)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                         
                         OutlinedTextField(
                             value = parcial1, 
                             onValueChange = { parcial1 = it },
-                            label = { Text("Parcial 1") }, 
+                            label = { Text("Razonamiento Lógico (P1)") }, 
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true, 
                             shape = RoundedCornerShape(14.dp),
@@ -325,7 +334,7 @@ fun NotaFormScreen(id: Int?, viewModel: NotaViewModel, onSuccess: () -> Unit, on
                         OutlinedTextField(
                             value = parcial2, 
                             onValueChange = { parcial2 = it },
-                            label = { Text("Parcial 2") }, 
+                            label = { Text("Comprensión Lectora (P2)") }, 
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true, 
                             shape = RoundedCornerShape(14.dp),
@@ -338,7 +347,7 @@ fun NotaFormScreen(id: Int?, viewModel: NotaViewModel, onSuccess: () -> Unit, on
                         OutlinedTextField(
                             value = examenFinal, 
                             onValueChange = { examenFinal = it },
-                            label = { Text("Examen Final") }, 
+                            label = { Text("Conocimientos Especialidad (EF)") }, 
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             singleLine = true, 
                             shape = RoundedCornerShape(14.dp),
@@ -355,7 +364,7 @@ fun NotaFormScreen(id: Int?, viewModel: NotaViewModel, onSuccess: () -> Unit, on
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                "Nota: La nota final y el estado de aprobación son calculados de forma automática por el servidor.",
+                                "Nota: El promedio de admisión y el estado de ingreso (Admitido / No Admitido) son calculados de forma automática por el servidor.",
                                 modifier = Modifier.padding(12.dp), 
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant

@@ -210,11 +210,47 @@ GestionEducativaMovil/app/src/main/java/com/gestion/educativa/
 
 ---
 
-## ⚙️ Compilación del APK
+## ⚙️ Compilación e Instalación del APK
 
-Para generar el instalable de pruebas desde la raíz de `GestionEducativaMovil/`:
+### 🛠️ A. Compilación del APK (Desarrollador)
+Para generar el instalable de pruebas desde la raíz del proyecto `GestionEducativaMovil/` usando la terminal:
 ```powershell
 ./gradlew assembleDebug
 ```
 Ubicación del APK generado:
 `GestionEducativaMovil/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+### 📲 B. Instalación del APK en Teléfonos
+
+El archivo ejecutable listo para entregar se encuentra en la raíz de este repositorio: **[app-debug.apk](file:///c:/Users/Usuario/Desktop/Movil_Gestion_MA/app-debug.apk)**.
+
+Para instalarlo en cualquier dispositivo Android, siga estas recomendaciones:
+
+#### 1. Instalación Estándar (Recomendada)
+1. Transfiera el archivo `app-debug.apk` a la memoria de su teléfono.
+2. Abra el archivo desde el gestor de archivos de su celular.
+3. Si Android muestra una advertencia de seguridad (Play Protect), pulse sobre **"Más detalles"** y luego en **"Instalar de todos modos"**.
+4. Autorice al gestor de archivos a instalar aplicaciones de orígenes desconocidos si el sistema lo solicita.
+
+#### ⚠️ Problemas Comunes y Soluciones:
+*   **"No se instaló la aplicación" o "Fallo de firma":** Esto sucede si ya tiene instalada una versión anterior de la app. **Debe desinstalar por completo cualquier versión previa** del teléfono antes de instalar el nuevo APK.
+*   **"El instalador de paquetes continúa fallando" (Error del sistema):** Ocurre a veces con APKs debug en ciertas marcas de teléfonos. La forma más robusta de solucionarlo es instalarlo mediante la herramienta `adb` de Android desde el computador.
+
+#### 💻 2. Instalación Avanzada por Consola (Mediante ADB)
+Si dispone de las herramientas de Android SDK instaladas, conecte el teléfono por USB (con la depuración USB activa) y ejecute desde la terminal:
+
+*   **Usando la ruta del SDK de Android Studio (Windows):**
+    ```cmd
+    %LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe install -r app-debug.apk
+    ```
+*   **Si `adb` está en su variable de entorno PATH:**
+    ```cmd
+    adb install -r app-debug.apk
+    ```
+*   **Ejecutando desde la consola integrada de Android Studio (Instalación automática):**
+    ```powershell
+    ./gradlew installDebug
+    ```
+

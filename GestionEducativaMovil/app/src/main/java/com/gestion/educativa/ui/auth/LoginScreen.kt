@@ -93,9 +93,9 @@ fun LoginScreen(
             Spacer(Modifier.height(20.dp))
             
             Text(
-                text = "Gestión Educativa",
+                text = "Admisión de Instituto Educativo",
                 style = MaterialTheme.typography.headlineMedium.copy(
-                    fontSize = 28.sp,
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 0.5.sp
                 ),

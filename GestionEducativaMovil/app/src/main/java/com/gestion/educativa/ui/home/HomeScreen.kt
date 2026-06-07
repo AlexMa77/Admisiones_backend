@@ -90,7 +90,7 @@ fun HomeScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        "Gestión Educativa", 
+                        "Admisión de Instituto Educativo", 
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.5.sp
                     ) 

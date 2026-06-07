@@ -1,230 +1,175 @@
-# 📱 Admisión de Instituto Educativo (Movil_Gestion_MA)
-### Cliente Móvil Android de Gestión Académica y Matrículas
+# 🎓 Admisión de Instituto Educativo
+### Cliente Móvil Android para la Gestión de Admisiones y Nivelación Académica
 
 ---
 
-## 📄 Descripción General
+## 📄 Descripción del Sistema
 
-**Admisión de Instituto Educativo** es una aplicación móvil nativa para Android desarrollada en **Kotlin** y construida con **Jetpack Compose**. Su propósito principal es ofrecer una solución integral para el control de admisiones, administración de matrículas, asignación de asignaturas y registro de calificaciones en una institución de educación superior.
+**Admisión de Instituto Educativo** es una aplicación móvil nativa para Android diseñada específicamente para automatizar, controlar y evaluar el **Proceso de Admisiones y Nivelación Académica** de aspirantes a educación superior.
 
-El sistema funciona como un cliente móvil que consume de forma segura una API REST externa desarrollada en **Django REST Framework** y respaldada por una base de datos relacional **PostgreSQL**, ambos alojados en un servidor de producción.
+A través de una interfaz ágil construida en **Jetpack Compose** y una arquitectura estructurada en **MVVM**, el sistema permite realizar el acompañamiento completo del aspirante: desde su postulación inicial y registro de datos personales, hasta su asignación a cursos de nivelación y el resultado final de admisión (determinado por sus calificaciones de ingreso).
 
-La aplicación destaca por incorporar un control estricto de acceso basado en tokens de seguridad **JWT**, permitiendo diferenciar de manera inteligente las funcionalidades visibles según el rol del usuario (Administrador con permisos de escritura completa vs. Usuario estándar con permisos de consulta).
-
----
-
-## 🛠️ Arquitectura y Tecnologías Clave
-
-La ingeniería de software aplicada en este proyecto se basa en los estándares recomendados por Google para el desarrollo Android moderno:
-
-* **Arquitectura Limpia & MVVM**: Separación estricta de responsabilidades en capas claras:
-  - **Datos (Data Layer)**: Manejo de red mediante Retrofit, interceptores HTTP, y persistencia local de preferencias.
-  - **Dominio (Domain Layer/Models)**: Representación pura del negocio y validación de datos.
-  - **Presentación (Presentation Layer)**: Vistas reactivas construidas en Compose coordinadas por ViewModels que retienen y exponen estados inmutables.
-* **UI Declarativa**: Toda la interfaz visual ha sido diseñada desde cero usando **Jetpack Compose** y **Material Design 3**, asegurando una experiencia de usuario (UX) fluida, moderna y responsiva.
-* **Inyección de Dependencias**: Implementación de **Dagger Hilt** para garantizar la modularidad del código, desacoplamiento y facilitar las pruebas unitarias.
-* **Programación Asíncrona**: Uso de **Kotlin Coroutines** y reactividad con **StateFlow** para realizar operaciones en segundo plano sin congelar el hilo principal de la interfaz.
-* **Persistencia Segura**: Uso de **DataStore Preferences** para guardar de manera asíncrona y segura la sesión del usuario (Access & Refresh Tokens).
+La aplicación consume una API REST segura en **Django REST Framework** conectada a una base de datos **PostgreSQL**, ambos alojados en producción.
 
 ---
 
-## ⚙️ Requisitos del Entorno
+## 🚀 Flujo del Proceso de Admisión en la App
 
-### Requisitos de Desarrollo
-Para compilar, depurar y ejecutar la aplicación desde su código fuente, asegúrese de contar con:
-* **Entorno Integrado**: Android Studio Hedgehog.
-* **Kit de Desarrollo**: Java Development Kit (JDK).
-* **SDK de Android**: Versión mínima de SDK compatible (Min SDK) **API 26 (Android 8.0)**, y SDK objetivo (Target SDK) **API 34**.
-* **Gestor de Dependencias**: Gradle compatible con Kotlin DSL (`build.gradle.kts`).
+El sistema está estructurado para guiar al aspirante y al administrador a través de las fases clave de admisión:
 
-### Requisitos del Dispositivo de Pruebas
-* **Dispositivo Físico o Virtual (AVD)** con Android 8.0 o superior.
-* **Acceso a Red**: Conexión activa a Internet para consumir la API de producción, o estar conectado a la misma red local del servidor de desarrollo.
+```mermaid
+graph TD
+    A["1. Registro e Ingreso"] -->|Aspirante crea cuenta| B["2. Postulación a Carrera"]
+    B -->|Asignación de Facultad y Carrera| C["3. Curso de Nivelación"]
+    C -->|Matrícula en materias de admisión| D["4. Evaluación de Ingreso"]
+    D -->|Carga de notas por el docente| E{"5. Resultado de Admisión"}
+    E -->|Nota Final >= 7.0| F["[APROBADO] Admitido como Alumno"]
+    E -->|Nota Final < 7.0| G["[REPROBADO] No Admitido"]
+```
+
+1. **Registro e Ingreso**: El postulante crea su cuenta en la app (`register`) e inicia sesión (`login`).
+2. **Postulación**: Se registra la ficha del postulante (*Estudiante*) vinculándolo a la *Carrera* y *Facultad* a la que aspira ingresar.
+3. **Periodo de Nivelación**: El postulante es matriculado (*Matrícula*) en los cursos propedéuticos y de admisión correspondientes a su área académica (*Materias* de nivelación).
+4. **Evaluación**: Los docentes asignados califican el rendimiento del postulante (*Notas*).
+5. **Veredicto**: El backend procesa las calificaciones de manera automática. Si el promedio cumple con la nota mínima requerida, el estado de la matrícula cambia a aprobado y se formaliza su admisión.
 
 ---
 
-## 🌐 Configuración de la Red y URL del Servidor
+## 🗂️ Organización de Módulos y Entidades
 
-La comunicación con el backend está centralizada en el módulo de inyección de dependencias de red. Para alternar entre el servidor de pruebas en producción y un entorno de desarrollo local, modifique la constante `BASE_URL` en el archivo:
+Para mayor claridad, el sistema separa la información en dos grandes categorías de datos: **Estructura de Postulación** e **Instrumentación de Admisión**.
+
+### 🏛️ A. Estructura de Postulación
+Módulos que definen el destino académico del postulante:
+
+* **🏫 1. Facultades (`/api/facultades/`)**
+  Representa las áreas del conocimiento del instituto (ej. *Ingenierías, Ciencias de la Salud, Ciencias Sociales*).
+* **🎓 2. Carreras (`/api/carreras/`)**
+  Los planes de estudio ofertados que pertenecen a cada facultad (ej. *Ingeniería de Software, Ciberseguridad, Enfermería*).
+* **👤 3. Estudiantes / Aspirantes (`/api/estudiantes/`)**
+  El registro personal de los postulantes que solicitan admisión, vinculados a la carrera elegida y su semestre de ingreso.
+
+---
+
+### 📝 B. Instrumentación y Evaluación de Admisiones
+Módulos encargados de calificar y regular el ingreso de los aspirantes:
+
+* **💼 4. Docentes / Evaluadores (`/api/docentes/`)**
+  El cuerpo docente encargado de impartir y evaluar los cursos obligatorios de admisión.
+* **📚 5. Materias de Admisión (`/api/materias/`)**
+  Asignaturas propedéuticas requeridas para nivelar a los postulantes (ej. *Curso de Nivelación en Programación, Matemáticas Elementales*).
+* **✍️ 6. Matrículas de Admisión (`/api/matriculas/`)**
+  La vinculación del aspirante a las materias de admisión en el periodo activo (ej. Periodo `2026-I`).
+* **📊 7. Notas / Evaluación (`/api/notas/`)**
+  Registro de calificaciones (Parcial 1, Parcial 2 y Examen Final). El veredicto de admisión (Aprobado/Reprobado) y la nota final son calculados automáticamente en el servidor para evitar fraudes.
+
+---
+
+## 🗺️ Mapa de Pantallas por Módulo
+
+La navegación de la aplicación se organiza lógicamente en Compose Navigation según la fase del proceso en la que se encuentre el usuario:
+
+### 🔐 1. Módulo de Acceso y Seguridad
+* **Inicio de Sesión (`login`)**: Acceso seguro con credenciales JWT (diferencia botones de administrador y usuario estándar).
+* **Registro de Cuenta (`register`)**: Creación de nuevas cuentas para aspirantes de forma autónoma.
+* **Verificación (`verification`)**: Pantalla de validación de credenciales activas.
+* **Dashboard Principal (`home`)**: Panel de control con acceso directo a la administración de admisiones y reportes.
+
+### 🏢 2. Módulo de Gestión de Oferta Académica (CRUD completo)
+* **Facultades**: Lista de facultades (`facultad_list`), Ficha detallada (`facultad_detail/{id}`) y Formulario de creación (`facultad_form?id={id}`).
+* **Carreras**: Lista de carreras con filtros (`carrera_list`), Ficha detallada (`carrera_detail/{id}`) y Formulario de creación (`carrera_form?id={id}`).
+
+### 👥 3. Módulo de Aspirantes y Docentes (CRUD completo)
+* **Aspirantes**: Padrón de postulantes (`estudiante_list`), Perfil académico del aspirante (`estudiante_detail/{id}`) y Formulario de postulación (`estudiante_form?id={id}`).
+* **Evaluadores**: Lista de docentes (`docente_list`), Especialidad del evaluador (`docente_detail/{id}`) y Formulario de registro (`docente_form?id={id}`).
+
+### 📚 4. Módulo de Nivelación y Calificaciones (CRUD completo)
+* **Materias**: Lista de materias de admisión (`materia_list`), Detalle de créditos (`materia_detail/{id}`) y Creación de cursos (`materia_form?id={id}`).
+* **Matrículas**: Lista de inscripciones activas (`matricula_list`), Detalle de matrícula (`matricula_detail/{id}`) y Registro de matrículas (`matricula_form?id={id}`).
+* **Calificaciones**: Lista de notas (`nota_list`), Boletín del aspirante (`nota_detail/{id}`) y Carga de calificaciones de ingreso (`nota_form?id={id}`).
+
+---
+
+## ⚙️ Configuración y Puntos de Conexión
+
+### Dirección del Servidor de Admisiones
+La comunicación está centralizada en el módulo Hilt del cliente Android:
 
 📂 `GestionEducativaMovil/app/src/main/java/com/gestion/educativa/di/AppModule.kt`
 
 ```kotlin
-// =========================================================================
-// CONFIGURACIÓN DE APUNTAMIENTO DE RED
-// =========================================================================
-
-// Opción A: Servidor de Producción (Configuración por defecto para Alex Macias)
+// Servidor de Producción de Admisiones (Alex Macias)
 private const val BASE_URL = "http://macias-admisiones.uaeftt-ute.site/api/"
 
-// Opción B: Entorno de Desarrollo Local (Conexión desde Emulador AVD)
+// Servidor de Desarrollo Local (Conexión desde Emulador AVD)
 // private const val BASE_URL = "http://10.0.2.2:8000/api/"
 ```
 
-> [!TIP]
-> La dirección IP `10.0.2.2` es un alias especial utilizado por el emulador de Android Studio para comunicarse de manera transparente con el puerto `localhost` (`127.0.0.1`) de la máquina donde se ejecuta el backend.
+### Credenciales de Acceso
+* **Administrador de Admisiones (Permisos de Escritura/Modificación)**:
+  * **Usuario**: `admin` | **Contraseña**: `admin` | **Rol**: `is_staff = true`
+* **Postulante / Usuario de Consulta (Solo Lectura)**:
+  * **Usuario**: `usuario1` | **Contraseña**: `usuario1` | **Rol**: `is_staff = false`
+
+> [!NOTE]
+> Para la administración global de cuentas, los accesos directos al panel web de Django Admin son:
+> * **Panel Web Principal**: [https://macias-admisiones.uaeftt-ute.site/admin](https://macias-admisiones.uaeftt-ute.site/admin)
+> * **Panel Web Alternativo**: [http://143.244.157.1/admin/](http://143.244.157.1/admin/)
 
 ---
 
-## 🔑 Credenciales de Acceso y Gestión de Roles
+## 🔌 Ejemplos de Interacción con la API de Admisiones
 
-El acceso a la información y las acciones dentro de la aplicación están controlados por un sistema de permisos basado en el campo `is_staff` codificado dentro del token JWT:
-
-### 1. Perfil Administrador (Acciones de Escritura y Modificación)
-* **Usuario**: `admin`
-* **Contraseña**: `admin`
-* **Permisos**: Crear nuevas facultades/carreras, matricular estudiantes, registrar notas, modificar datos existentes y eliminar registros.
-* **Condición de Rol**: `is_staff = true` en la base de datos del backend.
-
-### 2. Perfil Estándar (Acciones de Consulta)
-* **Usuario**: `usuario1`
-* **Contraseña**: `usuario1`
-* **Permisos**: Visualización de listas académicas y consulta de detalles en modo solo lectura. No tiene permisos de creación, edición ni borrado.
-* **Condición de Rol**: `is_staff = false`.
-
-> [!IMPORTANT]
-> El rol y el nombre de usuario se determinan en tiempo de ejecución decodificando el Payload del JWT utilizando la clase utilitaria [JwtUtils.kt](file:///c:/Users/Usuario/Desktop/Movil_Gestion_MA/GestionEducativaMovil/app/src/main/java/com/gestion/educativa/utils/JwtUtils.kt).
->
-> Los usuarios se pueden administrar, crear o modificar a través de los paneles administrativos de Django Admin:
-> * **Panel de Producción (Dominio)**: [https://macias-admisiones.uaeftt-ute.site/admin](https://macias-admisiones.uaeftt-ute.site/admin)
-> * **Panel de Producción (IP)**: [http://143.244.157.1/admin/](http://143.244.157.1/admin/)
-> * **Panel de Desarrollo Local**: `http://localhost:8000/admin/`
-
----
-
-## 🗂️ Módulos y Entidades del Negocio
-
-La aplicación realiza operaciones de lectura, escritura, actualización y eliminación (CRUD) para las siguientes **7 entidades** académicas principales:
-
-```mermaid
-graph TD
-    Facultad["1. Facultades"] --> Carrera["2. Carreras"]
-    Carrera --> Estudiante["4. Estudiantes"]
-    Carrera --> Materia["5. Materias"]
-    Docente["3. Docentes"] --> Materia
-    Estudiante --> Matricula["6. Matrículas"]
-    Materia --> Matricula
-    Matricula --> Nota["7. Notas"]
-```
-
-### 🏫 1. Facultades (`/api/facultades/`)
-Representa las divisiones académicas estructurales del instituto.
-* **Campos principales**: Nombre oficial de la facultad, Código identificador único, Descripción institucional, Estado (Activo/Inactivo).
-* **Filtros**: Permite búsquedas por nombre y código de facultad.
-
-### 🎓 2. Carreras (`/api/carreras/`)
-Los distintos programas de estudio que imparte cada facultad.
-* **Campos principales**: Nombre del programa, Código curricular, Relación a la Facultad responsable (FK), Duración del plan de estudios en semestres, Estado.
-* **Filtros**: Búsqueda por texto y agrupamiento por facultad.
-
-### 💼 3. Docentes (`/api/docentes/`)
-Registro formal de la plantilla docente del instituto.
-* **Campos principales**: Vinculación al usuario del sistema (FK), Número de Cédula/DNI, Teléfono de contacto, Especialidad académica principal, Estado de contratación.
-
-### 👤 4. Estudiantes (`/api/estudiantes/`)
-Base de datos de los alumnos inscritos en los distintos programas.
-* **Campos principales**: Vinculación al usuario del sistema (FK), Carrera en la que está inscrito (FK), Cédula/DNI, Teléfono, Semestre actual cursado, Estado de permanencia.
-
-### 📚 5. Materias (`/api/materias/`)
-Asignaturas individuales que componen las mallas curriculares.
-* **Campos principales**: Nombre de la materia, Código de asignatura, Carrera de pertenencia (FK), Docente asignado (FK), Número de créditos, Nivel/Semestre asignado, Estado.
-
-### ✍️ 6. Matrículas (`/api/matriculas/`)
-La formalización del estudiante cursando una asignatura específica.
-* **Campos principales**: Estudiante inscrito (FK), Materia asociada (FK), Período académico (ej. 2026-I), Estado de la matrícula (Activa, Retirada, Finalizada), Fecha de registro.
-
-### 📊 7. Notas (`/api/notas/`)
-Seguimiento cualitativo y cuantitativo del rendimiento de los estudiantes.
-* **Campos principales**: Matrícula asociada (FK), Calificación Parcial 1, Calificación Parcial 2, Nota Examen Final.
-* **Cálculo Automático**: La Nota Final y la condición de "Aprobado/Reprobado" se calculan y validan directamente en el servidor backend al persistirse las calificaciones.
-
----
-
-## 🗺️ Mapa de Navegación y Rutas Compose
-
-La navegación de la aplicación está descentralizada a través de Compose Navigation. Contiene un flujo estructurado con **24 vistas clave**:
-
-| Módulo / Flujo | Tipo de Pantalla | Ruta en el Código | Funcionalidad |
-|---|---|---|---|
-| **Acceso** | Inicio de Sesión | `login` | Autenticación con credenciales JWT |
-| | Registro de Cuenta | `register` | Creación de cuenta de usuario básico |
-| | Verificación | `verification` | Proceso de validación de credenciales |
-| **Inicio** | Dashboard Principal | `home` | Panel con accesos directos a los 7 módulos |
-| **Facultades** | Listado | `facultad_list` | Búsqueda, paginación y visualización |
-| | Detalle | `facultad_detail/{id}` | Ficha de información de la facultad |
-| | Formulario | `facultad_form?id={id}` | Creación o edición de facultades (Admin) |
-| **Carreras** | Listado | `carrera_list` | Consulta y agrupamiento por facultad |
-| | Detalle | `carrera_detail/{id}` | Ficha técnica de la carrera |
-| | Formulario | `carrera_form?id={id}` | Creación o modificación de carreras |
-| **Docentes** | Listado | `docente_list` | Visualización del personal docente activo |
-| | Detalle | `docente_detail/{id}` | Historial y especialidad del profesor |
-| | Formulario | `docente_form?id={id}` | Formulario de registro de docentes |
-| **Estudiantes** | Listado | `estudiante_list` | Padrón de alumnos inscritos en el sistema |
-| | Detalle | `estudiante_detail/{id}` | Perfil académico del estudiante |
-| | Formulario | `estudiante_form?id={id}` | Registro y actualización del estudiante |
-| **Materias** | Listado | `materia_list` | Malla curricular con filtros de búsqueda |
-| | Detalle | `materia_detail/{id}` | Datos informativos de la asignatura |
-| | Formulario | `materia_form?id={id}` | Asignación y registro de materias |
-| **Matrículas** | Listado | `matricula_list` | Control de estudiantes matriculados |
-| | Detalle | `matricula_detail/{id}` | Consulta del registro de inscripción |
-| | Formulario | `matricula_form?id={id}` | Inscripción a materias por periodo |
-| **Notas** | Listado | `nota_list` | Consulta general de calificaciones |
-| | Detalle | `nota_detail/{id}` | Boletín de calificaciones del alumno |
-| | Formulario | `nota_form?id={id}` | Carga y edición de calificaciones (Admin) |
-
----
-
-## 🔌 Consumo de Servicios REST (Ejemplos HTTP)
-
-### Autenticación e Intercambio de Tokens (POST)
-El cliente inicia sesión enviando credenciales limpias y recibe el par de tokens de seguridad para firmar las siguientes peticiones:
-
+### 1. Registro de un nuevo Aspirante (POST)
+El aspirante se registra en el sistema de manera autónoma:
 ```http
-POST http://macias-admisiones.uaeftt-ute.site/api/auth/login/
+POST http://macias-admisiones.uaeftt-ute.site/api/auth/register/
 Content-Type: application/json
 
 {
-  "username": "admin",
-  "password": "admin"
+  "username": "alex_estudiante",
+  "email": "alex.macias@estudiantes.edu.ec",
+  "password": "User1234!",
+  "first_name": "Alex",
+  "last_name": "Macias"
 }
 ```
 
-*Respuesta exitosa (HTTP 200 Ok):*
-```json
-{
-  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJpcy1zdGFmZiI6dHJ1ZX0...",
-  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ0b2tlbi1yZWZyZXNoIn0..."
-}
-```
-
-### Obtención Paginada y Filtrada (GET)
-Los listados consumen los endpoints incluyendo parámetros de página y búsqueda, inyectando el token Bearer en el interceptor:
-
+### 2. Creación de Ficha de Admisión (POST)
+El administrador vincula al usuario registrado con la carrera elegida:
 ```http
-GET http://macias-admisiones.uaeftt-ute.site/api/carreras/?page=1&search=Sistemas
-Authorization: Bearer <access_token>
-```
-
-### Envío de Nuevos Registros (POST)
-```http
-POST http://macias-admisiones.uaeftt-ute.site/api/carreras/
+POST http://macias-admisiones.uaeftt-ute.site/api/estudiantes/
 Authorization: Bearer <access_token>
 Content-Type: application/json
 
 {
-  "facultad": 1,
-  "nombre": "Ingeniería de Software",
-  "codigo": "IS-SOFTWARE-01",
-  "duracion_semestres": 9,
+  "user": 8,
+  "carrera": 2,
+  "cedula": "1711122233",
+  "telefono": "0991112223",
+  "semestre_actual": 1,
   "activo": true
 }
 ```
 
+### 3. Matrícula en Curso de Nivelación (POST)
+```http
+POST http://macias-admisiones.uaeftt-ute.site/api/matriculas/
+Authorization: Bearer <access_token>
+Content-Type: application/json
+
+{
+  "estudiante": 3,
+  "materia": 4,
+  "periodo": "2026-I",
+  "estado": "activa",
+  "fecha_matricula": "2026-06-07"
+}
+```
+
 ---
 
-## 🛠️ Estructura del Código Fuente del Cliente
-
-El código fuente en Android sigue un ordenamiento semántico estricto para facilitar el mantenimiento y la escalabilidad del proyecto:
+## 🛠️ Estructura del Proyecto Android
 
 ```
 GestionEducativaMovil/app/src/main/java/com/gestion/educativa/
@@ -233,71 +178,43 @@ GestionEducativaMovil/app/src/main/java/com/gestion/educativa/
 ├── 🖥️ MainActivity.kt               # Contenedor de la UI y controlador de ciclo de vida
 ├── 🔒 VerificationScreen.kt          # Módulo de control de acceso y verificación
 │
-├── 📁 data/                        # CAPA DE DATOS
+├── 📁 data/                        # CAPA DE DATOS (API REST, Interceptores, Repositorios)
 │   ├── 📁 api/
-│   │   ├── ApiService.kt           # Definición de peticiones HTTP con Retrofit
+│   │   ├── ApiService.kt           # Endpoints de Admisión con Retrofit
 │   │   ├── AuthInterceptor.kt      # Inyección dinámica de Bearer Tokens en headers
-│   │   └── TokenManager.kt         # Gestión e intercambio en memoria del token JWT
+│   │   └── TokenManager.kt         # Gestión del Token JWT en memoria
 │   ├── 📁 model/
-│   │   └── Models.kt               # Clases de datos y esquemas JSON (DTOs)
+│   │   └── Models.kt               # DTOs y Modelos de datos del aspirante
 │   ├── 📁 preferences/
-│   │   └── UserPreferences.kt      # Manejador de persistencia segura local (DataStore)
-│   └── 📁 repository/              # Acceso unificado a los orígenes de datos locales/remotos
+│   │   └── UserPreferences.kt      # Persistencia de sesión segura (DataStore)
+│   └── 📁 repository/              # Acceso unificado a datos locales y remotos
 │
 ├── 📁 di/                          # CAPA DE INYECCIÓN DE DEPENDENCIAS
-│   └── AppModule.kt                # Módulo Hilt para creación de Clientes HTTP, Retrofit y Repositorios
+│   └── AppModule.kt                # Módulo Hilt para Retrofit y Repositorios
 │
 ├── 📁 utils/                       # UTILERÍAS COMPARTIDAS
-│   ├── ErrorHandler.kt             # Manejador genérico de excepciones de red y códigos HTTP
+│   ├── ErrorHandler.kt             # Parsea excepciones HTTP en mensajes legibles
 │   ├── JwtUtils.kt                 # Parser local de Payloads JWT (Extracción de roles)
-│   └── Resource.kt                 # Tipo genérico sellado para gestión de estados (Loading, Success, Error)
+│   └── Resource.kt                 # Sealed class genérica para manejar estados de la interfaz
 │
-└── 📁 ui/                          # CAPA DE PRESENTACIÓN (VISTAS Y LOGICA DE INTERFAZ)
-    ├── 📁 theme/                   # Paleta de colores, tipografía y estilo visual de Material 3
-    ├── 📁 navigation/              # Configuración de rutas (Screen) y grafo Compose (NavGraph)
+└── 📁 ui/                          # CAPA DE PRESENTACIÓN (VISTAS EN JETPACK COMPOSE)
+    ├── 📁 theme/                   # Tema visual de Material 3 (Colores, Tipografías)
+    ├── 📁 navigation/              # Enrutador (Screen y NavGraph)
     ├── 📁 components/
-    │   └── CommonComponents.kt     # Widgets reutilizables (Botones, Cajas de texto, Alertas)
-    ├── 📁 auth/                    # Lógica y vistas de Login/Registro de usuarios
+    │   └── CommonComponents.kt     # Botones, campos de texto y diálogos de confirmación
+    ├── 📁 auth/                    # Vistas de Login y Registro de aspirantes
     ├── 📁 home/
-    │   └── HomeScreen.kt           # Dashboard principal con grilla interactiva
-    └── 📁 (entidades)/             # Paquetes CRUD específicos por cada entidad (Ej: facultad, carrera, nota...)
+    │   └── HomeScreen.kt           # Dashboard interactivo con los módulos de admisión
+    └── 📁 (entidades)/             # Pantallas y ViewModels por cada módulo (Facultades, Carreras, etc.)
 ```
 
 ---
 
-## ⚙️ Compilación e Instalación
+## ⚙️ Compilación del APK
 
-### Compilación por Consola (Gradle Wrapper)
-Para compilar la aplicación y generar el archivo APK ejecutable de depuración, ejecute la siguiente instrucción desde la consola de comandos en la raíz de `GestionEducativaMovil/`:
-
+Para generar el instalable de pruebas desde la raíz de `GestionEducativaMovil/`:
 ```powershell
 ./gradlew assembleDebug
 ```
-
-Al completarse el build, encontrará el archivo instalable en:
+Ubicación del APK generado:
 `GestionEducativaMovil/app/build/outputs/apk/debug/app-debug.apk`
-
----
-
-## 🔒 Nota de Configuración Backend (Generación de Claims Personalizados)
-
-Para garantizar la correcta distinción de roles dentro de la interfaz móvil, el backend Django debe inyectar el parámetro `is_staff` en la firma de sus tokens JWT.
-
-Asegúrese de contar con la siguiente lógica en el backend (ejemplo usando la librería `django-rest-framework-simplejwt`):
-
-```python
-# En el archivo serializers.py o views.py de autenticación de tu backend Django:
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        # Generamos el token por defecto
-        token = super().get_token(user)
-        
-        # Agregamos los claims personalizados requeridos por el cliente Android
-        token['is_staff'] = user.is_staff
-        token['username'] = user.username
-        
-        return token
-```

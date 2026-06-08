@@ -19,4 +19,10 @@ class EstudianteRepository @Inject constructor(private val api: ApiService) : Ba
         safeCall { api.updateEstudiante(id, r) }
 
     suspend fun delete(id: Int): Resource<Unit> = safeCall { api.deleteEstudiante(id) }
+
+    suspend fun listUsers(page: Int? = null, search: String? = null) =
+        safeCall { api.getUsers(page, search?.ifBlank { null }) }
+
+    suspend fun listCarreras(page: Int? = null, search: String? = null) =
+        safeCall { api.getCarreras(page, search?.ifBlank { null }) }
 }

@@ -21,7 +21,7 @@ object AppModule {
     // Cambia esta URL según el entorno:
     // Emulador Android → http://10.0.2.2:8000/api/
     // Dispositivo físico (misma red) → http://<IP_PC>:8000/api/
-    private const val BASE_URL = "http://macias-admisiones.uaeftt-ute.site/api/"
+    private const val BASE_URL = "https://macias-admisiones.uaeftt-ute.site/api/"
 
     @Provides
     @Singleton

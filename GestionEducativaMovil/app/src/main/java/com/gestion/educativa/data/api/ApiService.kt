@@ -20,6 +20,12 @@ interface ApiService {
     @POST("auth/logout/")
     suspend fun logout(@Body request: LogoutRequest): Response<Unit>
 
+    @GET("users/")
+    suspend fun getUsers(
+        @Query("page") page: Int? = null,
+        @Query("search") search: String? = null
+    ): Response<List<UserInfo>>
+
     // ── Facultades ────────────────────────────────────────────────────────────
 
     @GET("facultades/")

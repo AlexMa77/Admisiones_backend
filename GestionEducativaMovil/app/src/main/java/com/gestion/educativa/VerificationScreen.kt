@@ -87,7 +87,7 @@ fun VerificationScreen(onBack: () -> Unit) {
                         "Hilt" to "2.50",
                         "Retrofit" to "2.9.0",
                         "IP Servidor" to "143.244.157.1",
-                        "Dominio" to "http://macias-admisiones.uaeftt-ute.site",
+                        "Dominio" to "https://macias-admisiones.uaeftt-ute.site",
                     )
 
                     items.forEach { item ->

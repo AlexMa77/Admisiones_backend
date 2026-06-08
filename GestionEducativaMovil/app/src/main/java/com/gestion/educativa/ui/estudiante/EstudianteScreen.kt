@@ -228,7 +228,11 @@ fun EstudianteFormScreen(id: Int?, viewModel: EstudianteViewModel, onSuccess: ()
     var activo by remember { mutableStateOf(true) }
     var initialized by remember { mutableStateOf(false) }
 
-    LaunchedEffect(id) { if (id != null) viewModel.loadDetail(id) }
+    LaunchedEffect(id) {
+        viewModel.loadFormSupportData()
+        if (id != null) viewModel.loadDetail(id)
+    }
+    
     LaunchedEffect(state.selected) {
         if (id != null && !initialized && state.selected?.id == id) {
             val e = state.selected!!
@@ -236,6 +240,12 @@ fun EstudianteFormScreen(id: Int?, viewModel: EstudianteViewModel, onSuccess: ()
             telefono = e.telefono; semestre = e.semestreActual.toString(); activo = e.activo; initialized = true
         }
     }
+
+    val selectedUser = state.availableUsers.firstOrNull { it.id.toString() == userId }
+    val selectedUserLabel = selectedUser?.let { "${it.username} (${it.fullName})" } ?: state.selected?.userInfo?.let { "${it.username} (${it.fullName})" } ?: userId
+
+    val selectedCarrera = state.availableCarreras.firstOrNull { it.id.toString() == carreraId }
+    val selectedCarreraLabel = selectedCarrera?.nombre ?: state.selected?.carreraNombre ?: carreraId
 
     Scaffold(
         topBar = {
@@ -285,8 +295,76 @@ fun EstudianteFormScreen(id: Int?, viewModel: EstudianteViewModel, onSuccess: ()
                     ) {
                         Text("Detalles del Estudiante", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         
-                        FormField("ID de Usuario *", userId, { userId = it })
-                        FormField("ID de Carrera *", carreraId, { carreraId = it })
+                        // Selector de Usuario
+                        var userExpanded by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(
+                            expanded = userExpanded,
+                            onExpandedChange = { userExpanded = !userExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = selectedUserLabel,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Usuario *") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = userExpanded) },
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                )
+                            )
+                            ExposedDropdownMenu(
+                                expanded = userExpanded,
+                                onDismissRequest = { userExpanded = false }
+                            ) {
+                                state.availableUsers.forEach { user ->
+                                    DropdownMenuItem(
+                                        text = { Text("${user.username} (${user.fullName})") },
+                                        onClick = {
+                                            userId = user.id.toString()
+                                            userExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
+                        // Selector de Carrera
+                        var carreraExpanded by remember { mutableStateOf(false) }
+                        ExposedDropdownMenuBox(
+                            expanded = carreraExpanded,
+                            onExpandedChange = { carreraExpanded = !carreraExpanded }
+                        ) {
+                            OutlinedTextField(
+                                value = selectedCarreraLabel,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("Carrera *") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = carreraExpanded) },
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                )
+                            )
+                            ExposedDropdownMenu(
+                                expanded = carreraExpanded,
+                                onDismissRequest = { carreraExpanded = false }
+                            ) {
+                                state.availableCarreras.forEach { carrera ->
+                                    DropdownMenuItem(
+                                        text = { Text(carrera.nombre) },
+                                        onClick = {
+                                            carreraId = carrera.id.toString()
+                                            carreraExpanded = false
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
                         FormField("Cédula *", cedula, { cedula = it })
                         FormField("Teléfono", telefono, { telefono = it })
                         

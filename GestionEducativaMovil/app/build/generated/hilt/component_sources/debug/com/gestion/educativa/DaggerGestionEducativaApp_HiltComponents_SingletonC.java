@@ -658,7 +658,7 @@ public final class DaggerGestionEducativaApp_HiltComponents_SingletonC {
     }
 
     @Override
-    public void injectGestionEducativaApp(GestionEducativaApp gestionEducativaApp) {
+    public void injectGestionEducativaApp(GestionEducativaApp arg0) {
     }
 
     @Override

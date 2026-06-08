@@ -75,7 +75,7 @@ class StudentPortalViewModel @Inject constructor(
                 // 2. Fetch matriculas for this student
                 fetchMatriculas(foundStudent.id)
             } else {
-                _state.update { it.copy(isLoading = false, error = "No se encontró registro de estudiante para $username") }
+                _state.update { it.copy(isLoading = false, error = "No se encontró ficha de estudiante para $username. El administrador debe vincular tu cuenta a una carrera.") }
             }
         }
     }

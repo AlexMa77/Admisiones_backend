@@ -377,6 +377,7 @@ fun StudentPortalContent(
     }
 
     if (state.error != null) {
+        val isProfileMissing = state.error?.contains("No se encontró ficha de estudiante") == true
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -384,16 +385,53 @@ fun StudentPortalContent(
                 .padding(24.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                Icon(Icons.Default.ErrorOutline, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(56.dp))
-                Spacer(Modifier.height(12.dp))
-                Text(state.error ?: "Error al cargar la información", color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, fontWeight = FontWeight.Medium)
-                Spacer(Modifier.height(16.dp))
-                Button(
-                    onClick = { viewModel.loadStudentData() },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Text("Reintentar")
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isProfileMissing) {
+                    Icon(
+                        imageVector = Icons.Default.HourglassTop,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.size(64.dp)
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = "Registro de Ficha Pendiente",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        text = state.error ?: "",
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    Spacer(Modifier.height(24.dp))
+                    Button(
+                        onClick = { viewModel.loadStudentData() },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Actualizar Estado")
+                    }
+                } else {
+                    Icon(Icons.Default.ErrorOutline, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(56.dp))
+                    Spacer(Modifier.height(12.dp))
+                    Text(state.error ?: "Error al cargar la información", color = MaterialTheme.colorScheme.error, textAlign = TextAlign.Center, fontWeight = FontWeight.Medium)
+                    Spacer(Modifier.height(16.dp))
+                    Button(
+                        onClick = { viewModel.loadStudentData() },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Text("Reintentar")
+                    }
                 }
             }
         }

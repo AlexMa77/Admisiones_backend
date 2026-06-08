@@ -3,8 +3,7 @@ package com.gestion.educativa.ui.estudiante
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gestion.educativa.data.api.TokenManager
-import com.gestion.educativa.data.model.Estudiante
-import com.gestion.educativa.data.model.EstudianteRequest
+import com.gestion.educativa.data.model.*
 import com.gestion.educativa.data.repository.EstudianteRepository
 import com.gestion.educativa.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,6 +14,8 @@ import javax.inject.Inject
 data class EstudianteUiState(
     val items: List<Estudiante> = emptyList(),
     val selected: Estudiante? = null,
+    val availableUsers: List<UserInfo> = emptyList(),
+    val availableCarreras: List<Carrera> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val error: String? = null,
@@ -62,6 +63,31 @@ class EstudianteViewModel @Inject constructor(
                 is Resource.Success -> _state.update { it.copy(isLoading = false, selected = r.data) }
                 is Resource.Error -> _state.update { it.copy(isLoading = false, error = r.message) }
                 else -> {}
+            }
+        }
+    }
+
+    fun loadFormSupportData() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            val usersRes = repository.listUsers(page = 1)
+            val carrerasRes = repository.listCarreras(page = 1)
+            if (usersRes is Resource.Success && carrerasRes is Resource.Success) {
+                // Filter users to only include those ending with _estudiante, and optionally those not yet linked (but showing all student users is fine)
+                val filteredUsers = usersRes.data.filter { it.username.endsWith("_estudiante") }
+                _state.update { it.copy(
+                    isLoading = false,
+                    availableUsers = filteredUsers,
+                    availableCarreras = carrerasRes.data.results,
+                    error = null
+                ) }
+            } else {
+                val errMsg = when {
+                    usersRes is Resource.Error -> usersRes.message
+                    carrerasRes is Resource.Error -> carrerasRes.message
+                    else -> "Error al cargar datos de soporte"
+                }
+                _state.update { it.copy(isLoading = false, error = errMsg) }
             }
         }
     }

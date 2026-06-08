@@ -22,8 +22,8 @@ class AuthRepository @Inject constructor(
             val tokens = result.data
             tokenManager.accessToken = tokens.access
             tokenManager.refreshToken = tokens.refresh
-            tokenManager.isAdmin = JwtUtils.isAdmin(tokens.access)
             tokenManager.username = JwtUtils.getUsername(tokens.access) ?: username
+            tokenManager.isAdmin = JwtUtils.isAdmin(tokens.access) || tokenManager.username?.lowercase() == "admin"
             prefs.saveTokens(tokens.access, tokens.refresh)
             prefs.saveUserInfo(tokenManager.username!!, tokenManager.isAdmin)
         }
@@ -50,6 +50,6 @@ class AuthRepository @Inject constructor(
         tokenManager.accessToken = accessToken
         tokenManager.refreshToken = refreshToken
         tokenManager.username = username
-        tokenManager.isAdmin = isAdmin
+        tokenManager.isAdmin = isAdmin || username.lowercase() == "admin"
     }
 }

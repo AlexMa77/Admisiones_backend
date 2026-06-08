@@ -51,7 +51,7 @@ class AuthViewModel @Inject constructor(
                 val access = values[0]
                 val refresh = values[1]
                 val username = values[2]
-                val isAdmin = values[3].toBoolean()
+                val isAdmin = values[3].toBoolean() || username?.lowercase() == "admin"
                 if (access != null && refresh != null) {
                     repository.restoreSession(access, refresh, username ?: "", isAdmin)
                     val resolvedRole = RoleResolver.resolveRole(username, isAdmin)
@@ -70,7 +70,28 @@ class AuthViewModel @Inject constructor(
         }
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            when (val result = repository.login(username, password)) {
+            
+            var result = repository.login(username, password)
+            
+            val hasSuffix = username.endsWith("_estudiante") || username.endsWith("_docente") || username.lowercase() == "admin"
+            
+            if (result is Resource.Error && !hasSuffix) {
+                // Si falla el usuario plano sin sufijo, probamos con _estudiante
+                val studentUsername = "${username}_estudiante"
+                val studentResult = repository.login(studentUsername, password)
+                if (studentResult is Resource.Success) {
+                    result = studentResult
+                } else {
+                    // Si también falla, probamos con _docente
+                    val teacherUsername = "${username}_docente"
+                    val teacherResult = repository.login(teacherUsername, password)
+                    if (teacherResult is Resource.Success) {
+                        result = teacherResult
+                    }
+                }
+            }
+            
+            when (result) {
                 is Resource.Success -> _state.update {
                     it.copy(
                         isLoading = false,
